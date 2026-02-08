@@ -1,0 +1,55 @@
+"""Custom exceptions related to server and external services like db."""
+
+import fastapi
+
+from toolkit.api.enums import HTTPStatusDoc, Status
+
+from .abc import APIException
+
+
+class BadRequestError(APIException):
+    """Exception raised when a bad request happened."""
+
+    status_code = fastapi.status.HTTP_400_BAD_REQUEST
+    status = Status.ERROR
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_400
+
+
+class DoesNotExistError(APIException):
+    """Exception raised when a resource not found."""
+
+    status_code = fastapi.status.HTTP_404_NOT_FOUND
+    status = Status.NOT_FOUND
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_404
+
+
+class DuplicateError(APIException):
+    """Exception raised when a resource is duplicated."""
+
+    status_code = fastapi.status.HTTP_409_CONFLICT
+    status = Status.CONFLICT
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_409
+
+
+class ValidationError(APIException):
+    """Exception raised when a validation error happened."""
+
+    status_code = fastapi.status.HTTP_422_UNPROCESSABLE_CONTENT
+    status = Status.ERROR
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_422
+
+
+class InternalServerError(APIException):
+    """Exception raised when an internal error happened."""
+
+    status_code = fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR
+    status = Status.FAILURE
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_500
+
+
+class ServiceUnavailableError(APIException):
+    """Exception raised when a service is not available."""
+
+    status_code = fastapi.status.HTTP_503_SERVICE_UNAVAILABLE
+    status = Status.FAILURE
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_503
