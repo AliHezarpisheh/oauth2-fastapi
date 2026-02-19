@@ -6,11 +6,7 @@ from enum import StrEnum
 class OpenAPITags(StrEnum):
     """Define enumeration constants for OpenAPI tags."""
 
-    USERS = "Users"
-    PROPERTIES = "Properties"
-    BOOKINGS = "Bookings"
-    PAYMENTS = "Payments"
-    SEARCH = "Search"
-    NOTIFICATIONS = "Notifications"
-    REVIEWS = "Reviews"
+    OAUTH2 = "OAuth 2.0"
+    OIDC = "OpenID Connect"
+    PROTECTED = "Protected Endpoints"
     HEALTH_CHECK = "Health Check"
