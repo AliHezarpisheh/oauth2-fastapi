@@ -5,6 +5,7 @@ description = "An implementation of Oauth2 flows, using FastAPI."
 readme = "README.md"
 requires-python = ">=3.14.3"
 dependencies = [
+    "alembic>=1.18.4",
     "asyncpg>=0.31.0",
     "coloredlogs>=15.0.1",
     "fastapi[standard]>=0.128.4",
