@@ -4,7 +4,7 @@ from enum import StrEnum
 
 
 class OpenAPITags(StrEnum):
-    """Define enumeration constants for OpenAPI tags."""
+    """Enumeration of OpenAPI tags."""
 
     OAUTH2 = "OAuth 2.0"
     OIDC = "OpenID Connect"
