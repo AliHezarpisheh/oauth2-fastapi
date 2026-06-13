@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import sql
+import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -21,14 +21,16 @@ class TimestampMixin:
     """A mixin class to add created_at and modified_at timestamp fields."""
 
     created_at: Mapped[datetime] = mapped_column(
-        server_default=sql.func.now(),
+        sa.DateTime(timezone=True),
+        server_default=sa.sql.func.now(),
         nullable=False,
         comment="Timestamp when the record was created",
     )
     modified_at: Mapped[datetime | None] = mapped_column(
+        sa.DateTime(timezone=True),
         default=None,
         nullable=True,
-        onupdate=sql.func.now(),
+        onupdate=sa.sql.func.now(),
         comment="Timestamp when the record was last modified",
     )
 
