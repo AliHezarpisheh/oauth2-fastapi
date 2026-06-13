@@ -4,7 +4,7 @@ from enum import StrEnum
 
 
 class EnvEnum(StrEnum):
-    """Enumeration class define different environments."""
+    """Enumeration of different environments."""
 
     DEVELOPMENT = "development"
     TESTING = "testing"
