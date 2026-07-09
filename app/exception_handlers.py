@@ -3,14 +3,14 @@
 import fastapi
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import JSONResponse
 
 from config.base import logger
 from toolkit.api.enums import HTTPStatusDoc, Messages, Status
 from toolkit.api.exceptions import APIException
 
 
-async def internal_exception_handler(_: Request, exc: Exception) -> ORJSONResponse:
+async def internal_exception_handler(_: Request, exc: Exception) -> JSONResponse:
     """
     Handle unexpected internal server errors.
 
@@ -26,11 +26,11 @@ async def internal_exception_handler(_: Request, exc: Exception) -> ORJSONRespon
 
     Returns
     -------
-    ORJSONResponse
+    JSONResponse
         A response object containing the error details.
     """
     logger.critical("Unhandled error occurred. Exception details: %s", exc)
-    return ORJSONResponse(
+    return JSONResponse(
         status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "status": Status.ERROR.value,
@@ -42,7 +42,7 @@ async def internal_exception_handler(_: Request, exc: Exception) -> ORJSONRespon
 
 async def request_validation_exception_handler(
     _: Request, exc: RequestValidationError
-) -> ORJSONResponse:
+) -> JSONResponse:
     """
     Handle FastAPI's RequestValidationError.
 
@@ -58,7 +58,7 @@ async def request_validation_exception_handler(
 
     Returns
     -------
-    ORJSONResponse
+    JSONResponse
         A response object containing the validation error details.
     """
     exc_data = exc.errors()[0]
@@ -69,7 +69,7 @@ async def request_validation_exception_handler(
     logger.error(
         "Handle request pydantic validation exception. Exception details: %s", exc_data
     )
-    return ORJSONResponse(
+    return JSONResponse(
         status_code=fastapi.status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={
             "status": Status.VALIDATION_ERROR.value,
@@ -80,7 +80,7 @@ async def request_validation_exception_handler(
     )
 
 
-async def api_exception_error_handler(_: Request, exc: APIException) -> ORJSONResponse:
+async def api_exception_error_handler(_: Request, exc: APIException) -> JSONResponse:
     """
     Handle all the API exceptions in the code.
 
@@ -96,11 +96,11 @@ async def api_exception_error_handler(_: Request, exc: APIException) -> ORJSONRe
 
     Returns
     -------
-    ORJSONResponse
+    JSONResponse
         A response object containing the error details.
     """
     logger.error("Handle %s. Exception details: %s", exc.__class__.__name__, exc)
-    return ORJSONResponse(
+    return JSONResponse(
         status_code=exc.status_code,
         content=exc.to_jsonable_dict(),
         headers=exc.http_headers,

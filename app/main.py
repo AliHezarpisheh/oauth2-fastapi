@@ -7,7 +7,6 @@ manager, and defines routes for handling various HTTP requests.
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import ORJSONResponse
 
 from config.base import settings
 from config.settings.openapi import responses
@@ -30,7 +29,6 @@ app = FastAPI(
     license_info=settings.openapi.license.model_dump(),
     openapi_tags=[tag.model_dump() for tag in settings.openapi.tags],
     responses=responses,
-    default_response_class=ORJSONResponse,
     redoc_url=None,
     lifespan=lifespan,
 )
