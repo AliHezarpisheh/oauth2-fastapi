@@ -16,7 +16,7 @@ class BaseSchema(BaseModel):
         from_attributes=True,
         alias_generator=to_camel,
         populate_by_name=True,
-        strict=True,
+        use_enum_values=True,
     )
 
 
