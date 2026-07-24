@@ -2,19 +2,25 @@
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.oauth2.helpers.enums import ClientStatusEnum, ClientTokenEndpointAuthMethod
+from app.oauth2.helpers.enums import ClientStatusEnum, ClientTokenEndpointAuthMethodEnum
 from toolkit.database import Base, CommonMixin
 from toolkit.database.annotations import str63, str255
+
+if TYPE_CHECKING:
+    from .scope import Scope
+else:
+    Scope = "Scope"
 
 
 class Client(CommonMixin, Base):
     """Model representing confidential clients in Oauth 2.0 framework."""
 
-    # Table configuration
+    # Configuration
     __tablename__ = "client"
     __table_args__ = (
         sa.Index("client_client_id_status_idx", "client_id", "status"),
@@ -47,10 +53,14 @@ class Client(CommonMixin, Base):
         server_default=ClientStatusEnum.ACTIVE.name,
         comment="Can disable some clients.",
     )
-    token_endpoint_auth_method: Mapped[ClientTokenEndpointAuthMethod] = mapped_column(
-        nullable=False,
-        server_default=ClientTokenEndpointAuthMethod.CLIENT_SECRET_BASIC.name,
-        comment="Specify different ways a confidential client can authenticate itself.",
+    token_endpoint_auth_method: Mapped[ClientTokenEndpointAuthMethodEnum] = (
+        mapped_column(
+            nullable=False,
+            server_default=ClientTokenEndpointAuthMethodEnum.CLIENT_SECRET_BASIC.name,
+            comment=(
+                "Specify different ways a confidential client can authenticate itself."
+            ),
+        )
     )
     last_secret_rotation: Mapped[datetime] = mapped_column(
         sa.DateTime(timezone=True),
@@ -59,4 +69,9 @@ class Client(CommonMixin, Base):
             "Recording the credential rotation time, as an security operational "
             "practice."
         ),
+    )
+
+    # Relationships
+    scopes: Mapped[list[Scope]] = relationship(
+        secondary="oauth2.client_scope", back_populates="clients"
     )
