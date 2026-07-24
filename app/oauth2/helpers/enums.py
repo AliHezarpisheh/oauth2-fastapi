@@ -3,6 +3,12 @@
 from enum import StrEnum
 
 
+class GrantTypesEnum(StrEnum):
+    """Enumeration of supported grant types."""
+
+    CLIENT_CREDENTIALS = "client_credentials"
+
+
 class ClientStatusEnum(StrEnum):
     """Enumeration of oauth 2.0 confidential client status."""
 
@@ -10,7 +16,7 @@ class ClientStatusEnum(StrEnum):
     DISABLED = "disabled"
 
 
-class ClientTokenEndpointAuthMethod(StrEnum):
+class ClientTokenEndpointAuthMethodEnum(StrEnum):
     """Enumeration of ways a confidential client can authenticate itself."""
 
     CLIENT_SECRET_BASIC = "client_secret_basic"
