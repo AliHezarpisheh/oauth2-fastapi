@@ -1,5 +1,7 @@
 import asyncio
+from collections.abc import MutableMapping
 from logging.config import fileConfig
+from typing import Literal
 
 from alembic import context
 from sqlalchemy import pool
@@ -33,6 +35,38 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# schema names
+SCHEMAS = {None, "oauth2"}  # None is the default
+
+# custom functions created manually, not by alembic #
+
+
+def include_name(
+    name: str | None,
+    type_: Literal[
+        "schema",
+        "table",
+        "column",
+        "index",
+        "unique_constraint",
+        "foreign_key_constraint",
+    ],
+    _: MutableMapping[
+        Literal[
+            "schema_name",
+            "table_name",
+            "schema_qualified_table_name",
+        ],
+        str | None,
+    ],
+) -> bool:
+    if type_ == "schema":
+        return name in SCHEMAS
+    return True
+
+
+# end of custom functions created manually, not by alembic #
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -52,6 +86,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_schemas=True,
+        include_name=include_name,
     )
 
     with context.begin_transaction():
@@ -59,7 +95,11 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_schemas=True,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
