@@ -3,10 +3,20 @@
 from enum import StrEnum
 
 
-class GrantTypesEnum(StrEnum):
-    """Enumeration of supported grant types."""
+class GrantTypeEnum(StrEnum):
+    """Enumeration of different grant types."""
 
+    AUTHORIZATION_CODE = "authorization_code"
     CLIENT_CREDENTIALS = "client_credentials"
+    IMPLICIT = "implicit"
+    REFRESH_TOKEN = "refresh_token"
+
+
+class ResponseTypeEnum(StrEnum):
+    """Enumeration of different response artifacts and types the endpoint can return."""
+
+    CODE = "code"
+    TOKEN = "token"
 
 
 class ClientStatusEnum(StrEnum):
