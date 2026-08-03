@@ -1,6 +1,6 @@
 """Module defining Base Pydantic schema for application schemas."""
 
-from typing import Annotated, Any
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
@@ -36,10 +36,10 @@ class APIResponse(BaseSchema):
     ]
 
 
-class APISuccessResponse(APIResponse):
+class APISuccessResponse[T: BaseModel](APIResponse):
     """Schema for successful API responses, including the actual data."""
 
-    data: Annotated[Any, Field(description="The actual data in the response.")]
+    data: Annotated[T, Field(description="The actual data in the response.")]
 
 
 class ErrorDetails(BaseSchema):
