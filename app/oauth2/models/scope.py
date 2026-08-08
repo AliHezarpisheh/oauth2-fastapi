@@ -38,6 +38,18 @@ class Scope(CommonMixin, Base):
 
     # Relationships
     clients: Mapped[list[Client]] = relationship(
-        secondary="oauth2.client",
+        secondary="oauth2.client_scope",
         back_populates="scopes",
+        passive_deletes=True,
     )
+
+    # Methods
+    def __str__(self) -> str:
+        """Return a human-readable string representation."""
+        return f"Scope: {self.scope_name}"
+
+    def __repr__(self) -> str:
+        """Return a string representation for debugging and development."""
+        return (
+            f"{self.__class__.__name__}(id={self.id!r}, scope_name={self.scope_name!r})"
+        )

@@ -50,6 +50,7 @@ class Client(CommonMixin, Base):
     )
     client_name: Mapped[str63] = mapped_column(
         nullable=False,
+        unique=True,
         comment=(
             "Just a name for debugging purposes, no logic should be created upon it."
         ),
@@ -125,5 +126,23 @@ class Client(CommonMixin, Base):
 
     # Relationships
     scopes: Mapped[list[Scope]] = relationship(
-        secondary="oauth2.client_scope", back_populates="clients"
+        secondary="oauth2.client_scope",
+        back_populates="clients",
+        passive_deletes=True,
     )
+
+    # Methods
+    def __str__(self) -> str:
+        """Return a human-readable string representation."""
+        return f"Client: {self.client_name} ({self.client_id})"
+
+    def __repr__(self) -> str:
+        """Return a string representation for debugging and development."""
+        return (
+            f"{self.__class__.__name__}("
+            f"id={self.id!r}, "
+            f"client_id={self.client_id!r}, "
+            f"client_name={self.client_name!r}, "
+            f"status={self.status!r}"
+            f")"
+        )
