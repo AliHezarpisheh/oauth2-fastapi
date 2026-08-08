@@ -40,6 +40,7 @@ default-groups = ["dev", "testing"]
 
 
 [tool.ruff]
+target-version = 'py314'
 line-length = 88
 lint.select = [
     "E",  # pycodestyle
@@ -48,8 +49,21 @@ lint.select = [
     "UP",  # pyupgrade
     "C90",  # mccabe
     "D",  # pydocstyle
+    "PL",  # pylint
     "I",  # isort
+    "ASYNC",  # flake8-async
+    "YTT",  # flake8-2020
+    # "S",  # flake8-bandit
+    # "BLE",  # flake8-blind-except
+    # "B",  # flake8-bugbear
+    # "C4",  # flake8-comprehension
+    # "PTH",  # flake8-use-pathlib
+    # "PYI",  # flake8-pyi
+    # "T10",  # flake8-debugger
+    # "DTZ",  # flake8-datetimez
     "RUF",  # Ruff specific rules
+    "FAST",  # FastAPI specific rules
+    # "TRY",  # tryceraptos specific rules
 ]
 lint.ignore = ["D104"]
 lint.exclude = ["*/alembic/*", "*/migrations/*"]
@@ -61,6 +75,10 @@ lint.fixable = [
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
@@ -76,7 +94,7 @@ include_trailing_comma = true
 strict = true
 ignore_missing_imports = true
 
-exclude = "tests/"
+exclude = ["tests/", "config/migrations/"]
 
 plugins = ["pydantic.mypy"]
 
