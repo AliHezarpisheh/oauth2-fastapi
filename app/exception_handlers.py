@@ -61,11 +61,16 @@ async def request_validation_exception_handler(
     JSONResponse
         A response object containing the validation error details.
     """
+    # TODO: Fix this shit.
     exc_data = exc.errors()[0]
     message = exc.errors()[0]["msg"]
     reason = exc.errors()[0]["type"]
     loc = exc_data["loc"][0]
-    field = exc_data["loc"][1] if len(exc_data["loc"]) >= 2 else "-" + f", in: {loc}"
+    field = (
+        exc_data["loc"][1]
+        if len(exc_data["loc"]) >= 2  # noqa: PLR2004 -- magic value is ok here.
+        else "-" + f", in: {loc}"
+    )
     logger.error(
         "Handle request pydantic validation exception. Exception details: %s", exc_data
     )
