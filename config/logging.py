@@ -34,7 +34,7 @@ class RelativePathFilter:
         The `relativepath` is computed by checking for site-packages`paths.
         It strips these paths to show only the relevant file path for debugging.
         """
-        relativepath = os.path.relpath(record.pathname, start=os.getcwd())
+        relativepath = os.path.relpath(record.pathname, start=Path.cwd())
 
         # If the record is for a third-party logger, remove the path to site-packages/.
         if "site-packages" in relativepath:
@@ -42,7 +42,7 @@ class RelativePathFilter:
                 relativepath = relativepath.split("site-packages/")[1]
             except IndexError:
                 pass  # Ignore if it doesn't match the expected structure.
-        setattr(record, "relativepath", relativepath)
+        record.relativepath = relativepath
 
         return True
 
@@ -61,7 +61,7 @@ class LoggingConfig:
         """Return a logger instance, initializing it if necessary."""
         if self._logger is None:
             self.setup()
-        assert self._logger is not None, "Logger setup failed to initialize logger"
+        assert self._logger is not None, "Logger setup failed to initialize logger"  # noqa: S101 - checking an internal invariant.
         return self._logger
 
     def setup(self) -> None:

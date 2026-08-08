@@ -44,9 +44,9 @@ Annotated[AsyncSession, Depends(get_async_db_session)]):
     db_session = db.get_session()
     try:
         yield db_session
-    except SQLAlchemyError:
+    except SQLAlchemyError as exc:
         await db_session.rollback()
         logger.error("Unexpected database error", exc_info=True)
-        raise InternalServerError(Messages.INTERNAL_SERVER_ERROR.value)
+        raise InternalServerError(Messages.INTERNAL_SERVER_ERROR.value) from exc
     finally:
         await db_session.close()

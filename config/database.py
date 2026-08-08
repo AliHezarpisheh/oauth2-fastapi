@@ -83,6 +83,7 @@ class AsyncDatabaseConnection:
             engine = self.get_engine()
             async with engine.connect() as conn:
                 await conn.execute(text("SELECT 1"))
-            return True
         except SQLAlchemyError:
             return False
+        else:
+            return True

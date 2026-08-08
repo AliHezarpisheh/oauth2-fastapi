@@ -9,14 +9,14 @@ class GrantTypeEnum(StrEnum):
     AUTHORIZATION_CODE = "authorization_code"
     CLIENT_CREDENTIALS = "client_credentials"
     IMPLICIT = "implicit"
-    REFRESH_TOKEN = "refresh_token"
+    REFRESH_TOKEN = "refresh_token"  # noqa: S105
 
 
 class ResponseTypeEnum(StrEnum):
     """Enumeration of different response artifacts and types the endpoint can return."""
 
     CODE = "code"
-    TOKEN = "token"
+    TOKEN = "token"  # noqa: S105
 
 
 class ClientStatusEnum(StrEnum):
@@ -29,5 +29,5 @@ class ClientStatusEnum(StrEnum):
 class ClientTokenEndpointAuthMethodEnum(StrEnum):
     """Enumeration of ways a confidential client can authenticate itself."""
 
-    CLIENT_SECRET_BASIC = "client_secret_basic"
-    CLIENT_SECRET_POST = "client_secret_post"
+    CLIENT_SECRET_BASIC = "client_secret_basic"  # noqa: S105
+    CLIENT_SECRET_POST = "client_secret_post"  # noqa: S105

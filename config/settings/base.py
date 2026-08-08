@@ -108,11 +108,11 @@ class Settings(BaseSettings):
         try:
             private_key_path = info.data["jwt_private_key_path"]
             keys_passphrase = info.data["jwt_keys_passphrase"]
-        except KeyError:
+        except KeyError as exc:
             raise RuntimeError(
                 "Failed to load the application settings, fix the `.env` file and "
                 "check for the `jwt_private_key_path` and `jwt_keys_passphrase` keys."
-            )
+            ) from exc
 
         path = Path(private_key_path)
         if not path.exists():
@@ -131,10 +131,11 @@ class Settings(BaseSettings):
             private_key = serialization.load_ssh_private_key(
                 key_file.read(), password=keys_passphrase.encode("utf-8")
             )
-        assert isinstance(private_key, RSAPrivateKey), (
-            "jwt_private_key should be instance of `RSAPrivateKey`, but got "
-            f"{type(private_key)}"
-        )
+        if not isinstance(private_key, RSAPrivateKey):
+            raise TypeError(
+                "jwt_private_key should be instance of `RSAPrivateKey`, but got "
+                f"{type(private_key)}"
+            )
         return private_key
 
     @field_validator("jwt_public_key", mode="before")
@@ -167,11 +168,11 @@ class Settings(BaseSettings):
         """
         try:
             public_key_path = info.data["jwt_public_key_path"]
-        except KeyError:
+        except KeyError as exc:
             raise RuntimeError(
                 "Failed to load the application settings, fix the `.env` file and "
                 "check for the `jwt_public_key_path` key."
-            )
+            ) from exc
 
         path = Path(public_key_path)
         if not path.exists():
@@ -188,10 +189,11 @@ class Settings(BaseSettings):
 
         with path.open("rb") as key_file:
             public_key = serialization.load_ssh_public_identity(key_file.read())
-        assert isinstance(public_key, RSAPublicKey), (
-            "jwt_private_key should be instance of `RSAPublicKey`, but got "
-            f"{type(public_key)}"
-        )
+        if not isinstance(public_key, RSAPublicKey):
+            raise TypeError(
+                "jwt_private_key should be instance of `RSAPublicKey`, but got "
+                f"{type(public_key)}"
+            )
         return public_key
 
     # Settings config

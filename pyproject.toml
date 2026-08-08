@@ -53,19 +53,22 @@ lint.select = [
     "I",  # isort
     "ASYNC",  # flake8-async
     "YTT",  # flake8-2020
-    # "S",  # flake8-bandit
-    # "BLE",  # flake8-blind-except
-    # "B",  # flake8-bugbear
-    # "C4",  # flake8-comprehension
-    # "PTH",  # flake8-use-pathlib
-    # "PYI",  # flake8-pyi
-    # "T10",  # flake8-debugger
-    # "DTZ",  # flake8-datetimez
+    "S",  # flake8-bandit
+    "BLE",  # flake8-blind-except
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehension
+    "PTH",  # flake8-use-pathlib
+    "PYI",  # flake8-pyi
+    "T10",  # flake8-debugger
+    "DTZ",  # flake8-datetimez
     "RUF",  # Ruff specific rules
     "FAST",  # FastAPI specific rules
-    # "TRY",  # tryceraptos specific rules
+    "TRY",  # tryceraptos specific rules
 ]
-lint.ignore = ["D104"]
+lint.ignore = [
+    "D104",  # Too much. Not all packages need docstring.
+    "TRY003",  # Find it unreasonable to create a class because the error msg is a little long.
+]
 lint.exclude = ["*/alembic/*", "*/migrations/*"]
 
 lint.fixable = [
@@ -75,6 +78,7 @@ lint.fixable = [
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["F401"]
+"tests/*.py" = ["S101"]
 
 [tool.ruff.format]
 quote-style = "double"

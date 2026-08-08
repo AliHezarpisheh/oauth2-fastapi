@@ -23,8 +23,9 @@ class TomlParser(Parser):
         try:
             with self.file_path.open(mode="rb") as file:
                 content = tomlkit.load(file)
-            return content
         except tomlkit.exceptions.ParseError as err:
             msg = f"Syntax Error in: `{self.file_path}`!"
             print(msg)
             raise TomlParsingError(msg) from err
+        else:
+            return content
