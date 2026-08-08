@@ -1,5 +1,6 @@
 from .abc import APIException
 from .custom_exceptions import (
+    BadRequestError,
     DoesNotExistError,
     DuplicateError,
     InternalServerError,
@@ -9,6 +10,7 @@ from .custom_exceptions import (
 
 __all__ = [
     "APIException",
+    "BadRequestError",
     "DoesNotExistError",
     "DuplicateError",
     "InternalServerError",
