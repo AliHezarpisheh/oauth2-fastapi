@@ -6,6 +6,7 @@ from enum import StrEnum
 class Status(StrEnum):
     """Enumeration of status messages used in API responses."""
 
+    # General
     SUCCESS = "success"
     FAILURE = "failure"
     ERROR = "error"
@@ -17,3 +18,6 @@ class Status(StrEnum):
     CREATED = "created"
     UPDATED = "updated"
     DELETED = "deleted"
+
+    # App specific
+    INVALID_SCOPE = "invalid_scope"
