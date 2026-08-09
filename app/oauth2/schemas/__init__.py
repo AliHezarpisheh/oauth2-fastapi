@@ -1,3 +1,4 @@
+from .client import ClientRegistrationRequestSchema, ClientRegistrationResponseSchema
 from .scope import (
     ScopeCreationRequestSchema,
     ScopeModificationRequestSchema,
@@ -5,6 +6,8 @@ from .scope import (
 )
 
 __all__ = [
+    "ClientRegistrationRequestSchema",
+    "ClientRegistrationResponseSchema",
     "ScopeCreationRequestSchema",
     "ScopeModificationRequestSchema",
     "ScopeResponseData",
