@@ -67,9 +67,10 @@ class ScopeDataAccessLayer:
             try:
                 result = await self.db_session.execute(stmt)
                 scope = result.scalar_one()
-                return scope
             except IntegrityError as exc:
                 self.handle_integrity_error(exc=exc, scope=scope_name)
+            else:
+                return scope
 
     async def update_scope(
         self,
@@ -118,11 +119,12 @@ class ScopeDataAccessLayer:
             try:
                 result = await self.db_session.execute(stmt)
                 scope = result.scalar_one()
-                return scope
             except IntegrityError as exc:
                 self.handle_integrity_error(exc=exc)
             except NoResultFound:
                 self.handle_no_result_found_error()
+            else:
+                return scope
 
     async def delete_scope(
         self,
@@ -198,7 +200,9 @@ class ScopeDataAccessLayer:
         return {**scope_present_values, "scope_name": scope_name}
 
     @staticmethod
-    def handle_integrity_error(exc: IntegrityError, scope: str) -> NoReturn:
+    def handle_integrity_error(
+        exc: IntegrityError, scope: str | None = None
+    ) -> NoReturn:
         """
         Translate a known duplicate-scope violation into a domain error.
 
@@ -206,8 +210,9 @@ class ScopeDataAccessLayer:
         ----------
         exc
             Integrity error raised by the database operation.
-        scope
-            Scope name involved in the failed operation.
+        scope: optional
+            Scope name involved in the failed operation. If not provided, the name won't
+            be in the response
 
         Raises
         ------
@@ -221,9 +226,12 @@ class ScopeDataAccessLayer:
             'duplicate key value violates unique constraint "scope_scope_name_key"'
             in str(exc)
         ):
-            raise ScopeDuplicateError(
-                ScopeMessages.SCOPE_ALREADY_EXIST.value.format(scope=scope)
+            msg = (
+                ScopeMessages.SCOPE_ALREADY_EXIST_WITH_SCOPE.value.format(scope=scope)
+                if scope
+                else ScopeMessages.SCOPE_ALREADY_EXIST_WITHOUT_SCOPE.value
             )
+            raise ScopeDuplicateError(msg)
 
         raise exc
 
