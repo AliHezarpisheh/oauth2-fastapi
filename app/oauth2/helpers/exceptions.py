@@ -6,6 +6,10 @@ from toolkit.api.enums import HTTPStatusDoc, Status
 from toolkit.api.exceptions import APIException, DoesNotExistError, DuplicateError
 
 
+class ClientDuplicateError(DuplicateError):
+    """Exception raised when a client already exist in the system."""
+
+
 class InvalidScopeError(APIException):
     """Exception that should raised when a scope is invalid, unknown, or malformed."""
 

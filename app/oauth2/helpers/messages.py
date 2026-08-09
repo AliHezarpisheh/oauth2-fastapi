@@ -7,6 +7,7 @@ class ClientMessages(StrEnum):
     """Enumeration of client-related messages, used in API responses."""
 
     SUCCESSFUL_CLIENT_REGISTRATION = "Client registered successfully."
+    CLIENT_ALREADY_EXIST = "Client {client_name} already exist in the system."
 
 
 class ScopeMessages(StrEnum):
