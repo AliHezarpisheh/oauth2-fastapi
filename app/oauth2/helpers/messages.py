@@ -8,6 +8,9 @@ class ClientMessages(StrEnum):
 
     SUCCESSFUL_CLIENT_REGISTRATION = "Client registered successfully."
     CLIENT_ALREADY_EXIST = "Client {client_name} already exist in the system."
+    GRANT_TYPES_AND_RESPONSE_TYPES_MISMATCH = (
+        "The grant types do not match with the response types."
+    )
 
 
 class ScopeMessages(StrEnum):

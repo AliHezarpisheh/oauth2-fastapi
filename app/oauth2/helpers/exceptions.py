@@ -10,6 +10,14 @@ class ClientDuplicateError(DuplicateError):
     """Exception raised when a client already exist in the system."""
 
 
+class InvalidClientMetaDataError(APIException):
+    """Exception that should raised when input data set client in an invalid state."""
+
+    status_code = fastapi.status.HTTP_400_BAD_REQUEST
+    status = Status.INVALID_CLIENT_METADATA
+    documentation_link = HTTPStatusDoc.HTTP_STATUS_400
+
+
 class InvalidScopeError(APIException):
     """Exception that should raised when a scope is invalid, unknown, or malformed."""
 

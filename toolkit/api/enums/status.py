@@ -21,3 +21,4 @@ class Status(StrEnum):
 
     # App specific
     INVALID_SCOPE = "invalid_scope"
+    INVALID_CLIENT_METADATA = "invalid_client_metadata"
