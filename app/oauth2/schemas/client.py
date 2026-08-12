@@ -85,3 +85,4 @@ class ClientRegistrationResponseSchema(CommonMixins, ClientBase):
     """Response schema for client registration, mirroring attributes back."""
 
     client_secret: str
+    client_secret_expires_at: int

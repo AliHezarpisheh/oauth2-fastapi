@@ -10,23 +10,21 @@ from app.oauth2.schemas import (
     ClientRegistrationRequestSchema,
     ClientRegistrationResponseSchema,
 )
-from toolkit.api.annotations import APISuccessResponseDict
 from toolkit.api.enums import OpenAPITags
-from toolkit.api.schemas import APISuccessResponse
 
 router = APIRouter(prefix="/register", tags=[OpenAPITags.OAUTH2])
 
 
 @router.post(
     "",
-    response_model=APISuccessResponse[ClientRegistrationResponseSchema],
+    response_model=ClientRegistrationResponseSchema,
     response_model_exclude_none=True,
     status_code=status.HTTP_201_CREATED,
 )
 async def register_client(
     client_registration_input: ClientRegistrationRequestSchema,
     client_service: Annotated[ClientService, Depends(get_client_service)],
-) -> APISuccessResponseDict[dict[str, Any]]:
+) -> dict[str, Any]:
     """Register a new OAuth2 client application."""
     return await client_service.register_client(
         client_registration_input=client_registration_input
