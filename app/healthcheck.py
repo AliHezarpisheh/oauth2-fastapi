@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from config.base import db
 from toolkit.api.exceptions import ServiceUnavailableError
 
-router = APIRouter(prefix="/health-check", tags=["Health Check"])
+router = APIRouter(prefix="/health", tags=["Health Check"])
 
 
 class HealthCheckResponse(BaseModel):
