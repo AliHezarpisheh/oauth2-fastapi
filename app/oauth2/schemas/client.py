@@ -1,6 +1,9 @@
 """Module defining schemas for client-related operations."""
 
-from pydantic import EmailStr, HttpUrl, field_validator
+from datetime import datetime
+from typing import Annotated
+
+from pydantic import EmailStr, Field, HttpUrl, field_validator
 
 from app.oauth2.helpers.enums import (
     ClientTokenEndpointAuthMethodEnum,
@@ -86,3 +89,50 @@ class ClientRegistrationResponseSchema(CommonMixins, ClientBase):
 
     client_secret: str
     client_secret_expires_at: int
+
+
+# Client initial access token
+
+
+class ClientInitialAccessTokenBase(BaseSchema):
+    """Schema holding common shared attributes between client IAT schemas."""
+
+    max_registration: Annotated[
+        int,
+        Field(
+            ge=1,
+            le=10_000,
+            default=1,
+        ),
+    ]
+    note: Annotated[
+        str | None,
+        Field(
+            description=(
+                "A note helping the end-user or admin with no business logic impaction."
+            ),
+        ),
+    ] = None
+
+
+class ClientInitialAccessTokenRequestSchemas(ClientInitialAccessTokenBase):
+    """Request schema for granting initial access token for client registration."""
+
+    expires_in: Annotated[
+        int,
+        Field(
+            ge=0,
+            le=43200,
+            description=(
+                "How many more seconds later the token should expire? 0 means never "
+                "expires and the maximum is set to 12 hours."
+            ),
+        ),
+    ]
+
+
+class ClientInitialAccessTokenResponseData(CommonMixins, BaseSchema):
+    """Response data schema for granting initial access token on client registration."""
+
+    token: str
+    expires_at: datetime
