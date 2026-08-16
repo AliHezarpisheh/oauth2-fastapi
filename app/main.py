@@ -9,6 +9,9 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
 from app.oauth2.api.routers.client import router as client_router
+from app.oauth2.api.routers.initial_access_token import (
+    router as initial_access_token_router,
+)
 from app.oauth2.api.routers.scope import router as scope_router
 from config.base import settings
 from config.settings.openapi import responses
@@ -52,4 +55,5 @@ app.add_exception_handler(
 # Include routers
 app.include_router(health_check_router)
 app.include_router(client_router)
+app.include_router(initial_access_token_router)
 app.include_router(scope_router)
