@@ -8,6 +8,7 @@ class Status(StrEnum):
 
     # General
     SUCCESS = "success"
+    GRANTED = "granted"
     FAILURE = "failure"
     ERROR = "error"
     VALIDATION_ERROR = "validation_error"
