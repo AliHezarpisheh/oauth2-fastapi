@@ -1,5 +1,6 @@
 """Module defining data access layer components related to clients."""
 
+from datetime import UTC, datetime, timedelta
 from typing import NoReturn
 
 from sqlalchemy import insert, select
@@ -8,8 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
 
 from app.oauth2.helpers.exceptions import ClientDuplicateError, InvalidScopeError
 from app.oauth2.helpers.messages import ClientMessages
-from app.oauth2.models import Client, ClientScope, Scope
-from app.oauth2.schemas import ClientRegistrationRequestSchema
+from app.oauth2.models import Client, ClientScope, InitialAccessToken, Scope
+from app.oauth2.schemas import (
+    ClientInitialAccessTokenRequestSchemas,
+    ClientRegistrationRequestSchema,
+)
 
 
 class ClientDataAccessLayer:
@@ -88,11 +92,52 @@ class ClientDataAccessLayer:
                     ],
                 )
             except IntegrityError as exc:
-                self.handle_integrity_error(
+                self.handle_client_integrity_error(
                     exc=exc, client_name=client_registration_input.client_name
                 )
             else:
                 return client, available_scope_names
+
+    async def create_initial_access_token(
+        self,
+        initial_access_token_input: ClientInitialAccessTokenRequestSchemas,
+        token_hash: str,
+    ) -> InitialAccessToken:
+        """
+        Create and persist an initial access token with its registration limits.
+
+        Parameters
+        ----------
+        initial_access_token_input
+            Token configuration, including its lifetime, registration limit, and
+            optional note.
+        token_hash
+            Hash of the token to persist instead of the plaintext token.
+
+        Returns
+        -------
+        InitialAccessToken
+            The newly created token record, including its expiration time and
+            registration limit.
+        """
+        stmt = (
+            insert(InitialAccessToken)
+            .values(
+                token_hash=token_hash,
+                expires_at=(
+                    datetime.now(UTC)
+                    + timedelta(seconds=initial_access_token_input.expires_in)
+                ),
+                max_registration=initial_access_token_input.max_registration,
+                note=initial_access_token_input.note,
+            )
+            .returning(InitialAccessToken)
+        )
+
+        async with self.db_session.begin():
+            result = await self.db_session.execute(stmt)
+            initial_access_token = result.scalar_one()
+            return initial_access_token
 
     # TODO: Application scopes don't change too much, so it is better to cache them.
     async def get_scopes_id(
@@ -135,7 +180,9 @@ class ClientDataAccessLayer:
         return [row.id for row in scopes], found_scopes
 
     @staticmethod
-    def handle_integrity_error(exc: IntegrityError, client_name: str) -> NoReturn:
+    def handle_client_integrity_error(
+        exc: IntegrityError, client_name: str
+    ) -> NoReturn:
         """
         Translate a duplicate client-name violation into a domain error.
 

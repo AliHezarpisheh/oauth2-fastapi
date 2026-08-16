@@ -13,6 +13,15 @@ class ClientMessages(StrEnum):
     )
 
 
+class InitialAccessTokenMessages(StrEnum):
+    """Enumeration of messages related to initial access token API operations."""
+
+    SUCCESSFUL_TOKEN_GRANT = (
+        "Initial token has successfully granted. Client can use it up to "  # noqa: S105
+        "{max_registration} time and it will expire at {expiration_time}."
+    )
+
+
 class ScopeMessages(StrEnum):
     """Enumeration of scope-related messages, used in API responses."""
 
