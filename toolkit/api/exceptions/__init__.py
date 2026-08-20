@@ -1,4 +1,5 @@
 from .abc import APIException
+from .auth import BearerAuthenticationFailedError
 from .custom_exceptions import (
     BadRequestError,
     DoesNotExistError,
@@ -11,6 +12,7 @@ from .custom_exceptions import (
 __all__ = [
     "APIException",
     "BadRequestError",
+    "BearerAuthenticationFailedError",
     "DoesNotExistError",
     "DuplicateError",
     "InternalServerError",
