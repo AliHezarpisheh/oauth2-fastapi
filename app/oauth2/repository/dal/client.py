@@ -3,12 +3,17 @@
 from datetime import UTC, datetime, timedelta
 from typing import NoReturn
 
-from sqlalchemy import insert, select
+from fastapi import BackgroundTasks
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
 
-from app.oauth2.helpers.exceptions import ClientDuplicateError, InvalidScopeError
-from app.oauth2.helpers.messages import ClientMessages
+from app.oauth2.helpers.exceptions import (
+    ClientDuplicateError,
+    InvalidScopeError,
+    InvalidTokenError,
+)
+from app.oauth2.helpers.messages import ClientMessages, InitialAccessTokenMessages
 from app.oauth2.models import Client, ClientScope, InitialAccessToken, Scope
 from app.oauth2.schemas import (
     ClientInitialAccessTokenRequestSchemas,
@@ -139,6 +144,89 @@ class ClientDataAccessLayer:
             initial_access_token = result.scalar_one()
             return initial_access_token
 
+    async def check_initial_access_token(
+        self,
+        token_hash: str,
+        background_tasks: BackgroundTasks | None = None,
+    ) -> None:
+        """
+        Validate an initial access token and consume one registration attempt.
+
+        Parameters
+        ----------
+        token_hash
+            Hash of the initial access token to validate.
+        background_tasks
+            Optional task manager used to defer deletion of an invalid token.
+
+        Raises
+        ------
+        InvalidTokenError
+            If the token does not exist or has expired.
+        InvalidTokenError
+            If the token violates an integrity constraint during consumption.
+
+        Notes
+        -----
+        A successful validation increments the token's registration count.
+        Invalid or expired tokens are deleted immediately or in the background,
+        depending on whether background tasks are available.
+        """
+        stmt = (
+            update(InitialAccessToken)
+            .values(registrations_used=InitialAccessToken.registrations_used + 1)
+            .where(
+                InitialAccessToken.token_hash == token_hash,
+                InitialAccessToken.expires_at > datetime.now(UTC),
+            )
+        )
+
+        try:
+            async with self.db_session.begin():
+                result = await self.db_session.execute(stmt)
+                if result.rowcount == 0:  # type: ignore[attr-defined]
+                    raise InvalidTokenError(
+                        InitialAccessTokenMessages.INVALID_TOKEN.value
+                    )
+        except IntegrityError as exc:
+            # Remove the token in background if it exists but in an invalid/expired
+            # state.
+            if background_tasks is not None:
+                background_tasks.add_task(
+                    self.delete_initial_access_token_by_token_hash,
+                    token_hash=token_hash,
+                )
+            else:
+                await self.delete_initial_access_token_by_token_hash(
+                    token_hash=token_hash
+                )
+
+            # Response to user by handling the integrity error.
+            self.handle_initial_access_token_integrity_error(exc=exc)
+
+    async def delete_initial_access_token_by_token_hash(
+        self,
+        token_hash: str,
+    ) -> None:
+        """
+        Delete an initial access token identified by its hash.
+
+        Parameters
+        ----------
+        token_hash
+            Hash of the initial access token to delete.
+
+        Notes
+        -----
+        No error is raised when no token matches the provided hash.
+        """
+        async with self.db_session.begin():
+            await self.db_session.execute(
+                delete(InitialAccessToken).where(
+                    InitialAccessToken.token_hash == token_hash
+                )
+            )
+
     # TODO: Application scopes don't change too much, so it is better to cache them.
     async def get_scopes_id(
         self, client_scopes: list[str]
@@ -208,5 +296,34 @@ class ClientDataAccessLayer:
             raise ClientDuplicateError(
                 ClientMessages.CLIENT_ALREADY_EXIST.format(client_name=client_name)
             )
+
+        raise exc
+
+    @staticmethod
+    def handle_initial_access_token_integrity_error(
+        exc: IntegrityError,
+    ) -> NoReturn:
+        """
+        Translate token-related integrity violations into a domain error.
+
+        Parameters
+        ----------
+        exc
+            Integrity error raised while creating or consuming an access token.
+
+        Raises
+        ------
+        InvalidTokenError
+            If the error represents an invalid or expired initial access token.
+        IntegrityError
+            The original exception if it represents another integrity
+            constraint violation.
+        """
+        if 'violates check constraint "initial_access_token_check"' in str(
+            exc
+        ) or 'violates check constraint "initial_access_token_expires_at_check"' in str(
+            exc
+        ):
+            raise InvalidTokenError(InitialAccessTokenMessages.INVALID_TOKEN.value)
 
         raise exc

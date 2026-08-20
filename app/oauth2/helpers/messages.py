@@ -20,6 +20,7 @@ class InitialAccessTokenMessages(StrEnum):
         "Initial token has successfully granted. Client can use it up to "  # noqa: S105
         "{max_registration} time and it will expire at {expiration_time}."
     )
+    INVALID_TOKEN = "Invalid token."  # noqa: S105
 
 
 class ScopeMessages(StrEnum):
