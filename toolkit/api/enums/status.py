@@ -13,6 +13,7 @@ class Status(StrEnum):
     ERROR = "error"
     VALIDATION_ERROR = "validation_error"
     NOT_FOUND = "not_found"
+    UNAUTHENTICATED = "unauthenticated"
     UNAUTHORIZED = "unauthorized"
     FORBIDDEN = "forbidden"
     CONFLICT = "conflict"
@@ -22,4 +23,5 @@ class Status(StrEnum):
 
     # App specific
     INVALID_SCOPE = "invalid_scope"
+    INVALID_TOKEN = "invalid_token"  # noqa: S105
     INVALID_CLIENT_METADATA = "invalid_client_metadata"
